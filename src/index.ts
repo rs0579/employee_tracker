@@ -36,11 +36,19 @@ function mainMenu() {
                 case 'add an employee role':
                     await addEmployeeRole()
                     break
+                case 'Exit':
+                    break
+
                 //I USED SWITCH HERE INSTEAD OF AN IF ELSE STATEMENT BECAUSE IT IS VERY LONG
             }
-        }
-        )
+        })
 }
+
+
+
+
+
+
 function addDepartment() {
     //the name of the department
     inquirer.prompt([
@@ -97,7 +105,7 @@ function addEmployee() {
             name: 'employeeRole'
         },
         {
-            type:'input',
+            type: 'input',
             message: 'Enter employee manager.',
             name: 'manager'
         }
