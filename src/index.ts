@@ -41,50 +41,46 @@ function mainMenu() {
         }
         )
 }
-function addDepartment(){
+function addDepartment() {
+    //the name of the department
     inquirer.prompt([
-        {
-            type: 'number',
-            message: 'Enter department id.',
-            name: 'departmentId'
-        },
         {
             type: 'input',
             message: 'Enter department name.',
             name: 'deparmentName'
         },
+        // {
+        //     type: 'number',
+        //     message: 'Enter department id.',
+        //     name: 'departmentId'
+        // },
     ])
 }
-function addRole(){
-    inquirer.prompt([{
-        type: 'number',
-        message: 'enter role id.',
-        name: 'roleId'
-    },
-    {
-        type: 'input',
-        message: 'Enter employee title',
-        name: 'title'
-    },
-    {
-        type: 'number',
-        message: 'Enter employee salary.',
-        name: 'salary'
-    },
-    {
-        type: 'number',
-        message: 'Enter department id.',
-        name: 'departmentId'
-    },
-])
+function addRole() {
+    inquirer.prompt([
+        // the name, salary, and department for the role 
+        {
+            type: 'input',
+            message: 'Enter role title',
+            name: 'title'
+        },
+        {
+            type: 'number',
+            message: 'Enter employee salary.',
+            name: 'salary'
+        },
+        {
+            type: 'number',
+            message: 'Enter role department.',
+            name: 'roleDepartement'
+        },
+    ]).then((answer) => {
+        //MAYBE HERE I USE THE PUSH METHOD AND DOT NOTATION ** ANSWERS.NAME.PUSH()
+    })
 }
 function addEmployee() {
     inquirer.prompt([
-        {
-            type: 'number',
-            message: 'Enter employee id.',
-            name: 'employeeId'
-        },
+        //employee’s first name, last name, role, and manager
         {
             type: 'input',
             message: 'Enter employee first name.',
@@ -95,14 +91,49 @@ function addEmployee() {
             message: 'Enter employee last name.',
             name: 'lastName'
         },
-        { 
-            type: "list", 
-            message: "Select a manager:", 
-            name: "managerId", 
-            choices: [...managers.map((m: any) => ({ name: m.name, value: m.id })), { name: "None", value: null }]
+        {
+            type: 'input',
+            message: 'Enter employee role',
+            name: 'employeeRole'
+        },
+        {
+            type:'input',
+            message: 'Enter employee manager.',
+            name: 'manager'
         }
     ])
+        .then((answer) => {
 
+        })
+
+}
+//WHAT I THINK I HAVE TI DO IS, IN THE FUNCTION, SELECT FROM A JOINED TABLE TO BE ABLE TO CREATE THE VIEW FUNCTIONS
+
+function viewDepartments() {
+    'SELECT * FROM departments'
+}
+
+function viewRoles() {
+    'SELECT job title, role id, the department that role belongs to, and the salary for that role FROM...'
+}
+
+function viewEmployees() {
+    'SELECT employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to FROM ... '
+
+
+
+}
+function addEmployeeRole() {
+    //select an employee to update and their new role
+    inquirer.prompt([
+        {
+            type: 'list',
+            message: 'Select an employee.',
+            name: 'options',
+            choices: [``]
+
+        }
+    ])
 }
 
 
