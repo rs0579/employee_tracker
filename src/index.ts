@@ -150,53 +150,43 @@ function viewDepartments() {
 }
 
 function viewRoles() {
-    pool.query(`SELECT roles.id, roles.title, roles.salary, departments.name AS department 
-    FROM roles
-    JOIN departments
-    ON roles.department_id = departments.id`
-        // 'SELECT job title, role id, the department that role belongs to, and the salary for that role FROM...'
+    pool.query(`SELECT role.id, role.title, department.name AS department, role.salary
+    FROM role
+    JOIN deparment 
+    ON department.id = role.department_id`
     )
 }
 
 function viewEmployees() {
     console.log('Anything')
-    pool.query('SELECT * FROM employee')
-        // pool.query(`SELECT employee.id, employee.first_name, employee.last_name, roles.title AS role, department.name AS department, roles.salary, manager.first_name  || manager.last_name AS manager
-        // FROM employee
-        // LEFT JOIN roles
-        // ON employee.role_id = roles.id
-        // LEFT JOIN department
-        // ON roles.department_id = departement.id
-        // LEFT JOIN employees manager
-        // ON employee.manager_id = manager.id`
-        //     // 'SELECT employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to FROM ... '
-        // )
-        .then(
-            ({ rows }) => {
-                console.table(rows);
-
-
-            }
-        )
+    pool.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title. department.name, role.salary, employee.manager_id 
+        FROM employee
+        LEFT JOIN role
+        ON employee.role = id.role`)
 }
+
 const addEmployeeRole = async () => {
     //select an employee to update and their new role
     const { employeeId, newRoleId } = await inquirer
         .prompt([
             {
-                type: 'input',
+                type: 'number',
                 name: 'employeeId',
                 message: 'Enter employee ID:'
             },
             {
-                type: 'input',
+                type: 'number',
                 name: 'newRoleId',
                 message: 'Enter new role ID:'
             }
         ]);
-    await pool.query('UPDATE employees SET role_id = $1 WHERE id = $2', [newRoleId, employeeId]);
+        const sql = `UPDATE employee SET role_id = $1 WHERE id = $2`
+    await pool.query(sql, [newRoleId, employeeId]);
     //THE ABOVE IS LIKE USING A TEMPLATE LITERAL IN THAT THE $1 AND 2 ARE EMPTY SLOTS THAT WILL BE FILLED BY newROLEID AND employeeID. IDK IF WE WERE SUPPOSED TO USE THIS IN THIS ASSIGNMENT.
 }
+
+// const sql = `UPDATE employee SET role_id = $1 WHERE id = $2`
+
 
 
 
