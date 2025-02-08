@@ -17,38 +17,40 @@ async function mainMenu() {
         ])
         .then(async (answer) => {
             //THE ANSWER IS WHAT I AM EXPRECTING - I TRIED TO USE ANSWER.CHOICE BUT IT DIDN'T WORK BECAUSE THE NAME IS CHOICE. THEN I JUST TRIED CHOICE BUT EVENTUALLY I JUST FOLLOWED WHAT I DID IN THE VEHICLE BUILDER. **MAYBE IF I CREATE A VARIABLE WITH THE DESTRUCTURE CHOICE IT'L WORK AS INTENTED**
-            switch (answer.choice) {
-                case 'view all departments':
-                    viewDepartments()
-                    break
-                case 'view all roles':
-                    viewRoles()
-                    break
-                case 'view all employees':
-                    viewEmployees()
-                    break
-                case 'add a department':
-                    addDepartmentPrompt()
-                    break
-                case 'add a role':
-                    addRolePrompt()
-                    break
-                case 'add an employee':
-                    addEmployeePrompt()
-                    break
-                case 'add an employee role':
-                    addEmployeeRole()
-                    break
-                case 'Exit':
-                    break
+                switch (answer.choice) {
+                    case 'view all departments':
+                        viewDepartments()
+                        break
+                    case 'view all roles':
+                        viewRoles()
+                        break
+                    case 'view all employees':
+                        viewEmployees()
+                        break
+                    case 'add a department':
+                        addDepartmentPrompt()
+                        break
+                    case 'add a role':
+                        addRolePrompt()
+                        break
+                    case 'add an employee':
+                        addEmployeePrompt()
+                        break
+                    case 'add an employee role':
+                        addEmployeeRole()
+                        break
+                    case 'Exit':
+                        break
+                    //I USED SWITCH HERE INSTEAD OF AN IF ELSE STATEMENT BECAUSE IT IS VERY LONG
+                }
+            
 
-                //I USED SWITCH HERE INSTEAD OF AN IF ELSE STATEMENT BECAUSE IT IS VERY LONG
-            }
         })
 }
 
+
 const addDepartment = async (deparmentName: string, departmentId: number) => {
-    const query = `INSERT INTO department (departmentId, departmentName) VALUES ($1, $2)`;
+    const query = `INSERT INTO department (id, name) VALUES ($1, $2)`;
     const values = [departmentId, deparmentName]
     try {
         await pool.query(query, values)
@@ -73,11 +75,12 @@ const addDepartmentPrompt = async () => {
         },
     ])
     await addDepartment(answers.departmentId, answers.departmentName)
+    //CHECK OVER THIS ONE, YOU MAY NEED TO INSERT QUERY AND VALUES
 
 }
-const addRole = async (title: string, salary: number, departmentName: string) => {
-    const query = `INSERT INTO roles (title, salary, departmentName) VALUES ($1, $2, $3)`;
-    const values = [title, salary, departmentName]
+const addRole = async (id: number, title: string, salary: number, department_id: number) => {\
+    const query = `INSERT INTO roles (id, title, salary, department_id) VALUES ($1, $2, $3)`;
+    const values = [id, title, salary, department_id]
     try {
         await pool.query(query, values)
     } catch (err) {
@@ -180,7 +183,7 @@ const addEmployeeRole = async () => {
                 message: 'Enter new role ID:'
             }
         ]);
-        const sql = `UPDATE employee SET role_id = $1 WHERE id = $2`
+    const sql = `UPDATE employee SET role_id = $1 WHERE id = $2`
     await pool.query(sql, [newRoleId, employeeId]);
     //THE ABOVE IS LIKE USING A TEMPLATE LITERAL IN THAT THE $1 AND 2 ARE EMPTY SLOTS THAT WILL BE FILLED BY newROLEID AND employeeID. IDK IF WE WERE SUPPOSED TO USE THIS IN THIS ASSIGNMENT.
 }
@@ -196,6 +199,37 @@ const addEmployeeRole = async () => {
 
 
 
-
-
 mainMenu()
+
+
+
+
+
+
+
+
+
+// .then(async (answer) => {
+//     //THE ANSWER IS WHAT I AM EXPRECTING - I TRIED TO USE ANSWER.CHOICE BUT IT DIDN'T WORK BECAUSE THE NAME IS CHOICE. THEN I JUST TRIED CHOICE BUT EVENTUALLY I JUST FOLLOWED WHAT I DID IN THE VEHICLE BUILDER. **MAYBE IF I CREATE A VARIABLE WITH THE DESTRUCTURE CHOICE IT'L WORK AS INTENTED**
+//     do {
+// if (answer.choice === 'view all departments') {
+//     viewDepartments()
+// } else if (answer.choice === 'view all roles') {
+//     viewRoles()
+// } else if (answer.choice === 'view all employees') {
+//     viewEmployees()
+// } else if (answer.choice === 'add a department') {
+//     addDepartmentPrompt()
+// } else if (answer.choice === 'add a role') {
+//     addRolePrompt()
+// } else if (answer.choice === 'add an employee') {
+//     addEmployeePrompt()
+// } else if (answer.choice === 'add an employee role') {
+//     addEmployeeRole()
+// } else (answer.choice === 'Exit')
+
+//             }
+//             while (answer.choice !== 'Exit')
+//         }
+//         )
+// }

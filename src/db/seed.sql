@@ -23,11 +23,11 @@ INSERT INTO employee
 VALUES 
 ('Bernadette','Washington', 1, 2),
 ('Ebony', 'Jenkins', 4, 5),
-('Devonte','Brown', 2),
-('Andre','Martin', 5),
-('Alexus','Freeman', 7),
+('Devonte','Brown', 2, null),
+('Andre','Martin', 5, null),
+('Alexus','Freeman', 7, null),
 ('Quintin','Jeffers', 6, 7),
-('Michael', 'Scott', 3);
+('Michael', 'Scott', 3, null);
 
 
 
