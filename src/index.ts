@@ -59,6 +59,15 @@ const addDepartment = async (deparmentName: string, departmentId: number) => {
 
     }
 }
+const addRole = async (id: number, title: string, salary: number, department_id: number) => {\
+    const query = `INSERT INTO roles (id, title, salary, department_id) VALUES ($1, $2, $3)`;
+    const values = [id, title, salary, department_id]
+    try {
+        await pool.query(query, values)
+    } catch (err) {
+        console.error('Error adding employee', err);
+    }
+}
 const addDepartmentPrompt = async () => {
 
     //the name of the department
@@ -77,15 +86,6 @@ const addDepartmentPrompt = async () => {
     await addDepartment(answers.departmentId, answers.departmentName)
     //CHECK OVER THIS ONE, YOU MAY NEED TO INSERT QUERY AND VALUES
 
-}
-const addRole = async (id: number, title: string, salary: number, department_id: number) => {\
-    const query = `INSERT INTO roles (id, title, salary, department_id) VALUES ($1, $2, $3)`;
-    const values = [id, title, salary, department_id]
-    try {
-        await pool.query(query, values)
-    } catch (err) {
-        console.error('Error adding employee', err);
-    }
 }
 const addRolePrompt = async () => {
     const answers = await inquirer.prompt([
