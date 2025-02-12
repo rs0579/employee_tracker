@@ -29,9 +29,7 @@ VALUES
 ('Quintin','Jeffers', 6, 7),
 ('Michael', 'Scott', 3, null);
 
-INSERT INTO role role
-(title, salary, department_name)
-VALUES ($1, $2, $3);
+-- INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3, (SELECT id FROM department WHERE name = department_id))
 
 
 -- 'Lawyer', 153500, 4

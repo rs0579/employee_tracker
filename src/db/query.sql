@@ -17,3 +17,10 @@ JOIN department ON role.department_id = department.id
 SELECT role.title AS role name, role.salary, department.name AS department
 FROM role
 Join department ON role.department_id = department.id
+
+-- INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3, (SELECT id FROM department WHERE name = department_id))
+
+SELECT employee.id, employee.first_name, employee.last_name, department.department_name AS department, role.title, role.salary, employee.manager_id
+FROM employee
+JOIN role ON employee.role_id = role.id
+JOIN department ON role.department_id = department.id

@@ -47,6 +47,28 @@ async function mainMenu() {
 
         })
 }
+async function viewDepartments() {
+    const results = await pool.query('SELECT * FROM department')
+    console.table(results.rows)
+    mainMenu()
+}
+async function viewRoles() {
+    const results = await pool.query(`SELECT role.id, role.title, department.name AS department, role.salary
+    FROM role
+    JOIN department 
+    ON department.id = role.department_id`
+    )
+    console.table(results.rows)
+    mainMenu()
+}
+const viewEmployees = async () => {
+    const results = await pool.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title AS Title, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id`)
+    console.table(results.rows)
+
+    mainMenu()
+}
+
+
 
 const addDepartment = async (departmentId: number, departmentName: string) => {
     const query = `INSERT INTO department (id, name) VALUES ($1, $2)`;
@@ -79,40 +101,25 @@ const addDepartmentPrompt = async () => {
     mainMenu()
     //CHECK OVER THIS ONE, YOU MAY NEED TO INSERT QUERY AND VALUES
 }
-async function viewDepartments() {
-    const results = await pool.query('SELECT * FROM department')
-    console.table(results.rows)
-    mainMenu()
-}
-async function viewRoles() {
-    const results = await pool.query(`SELECT role.id, role.title, department.name AS department, role.salary
-    FROM role
-    JOIN department 
-    ON department.id = role.department_id`
-    )
-    console.table(results.rows)
-    mainMenu()
-}
-const viewEmployees = async () => {
-    const results = await pool.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title. department.name, role.salary, employee.manager_id 
-        FROM employee
-        JOIN role, department
-        ON employee.role_id = role.id, department.role_id = role.id`)
-    console.table(results.rows)
 
-    mainMenu()
-}
 
-const addRole = async (title: string, salary: number, department_name: string) => {
-    const query = `INSERT INTO role (title, salary, department_name SELECT) VALUES ($1, $2, $3)`;
-    const values = [title, salary, department_name]
+
+
+
+
+
+const addRole = async (title: string, salary: number, departmentName: string) => {
+    const query = `INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3, (SELECT id FROM department WHERE name = department_id))`;
+    const values = [title, salary, departmentName]
     try {
-        await pool.query(query, values)
+        const results = await pool.query(query, values)
+        console.table(results.rowCount)
     } catch (err) {
         console.error('Error adding employee', err);
     }
 }
 const addRolePrompt = async () => {
+
     const answers = await inquirer.prompt([
         // the name, salary, and department for the role 
         {
@@ -126,22 +133,17 @@ const addRolePrompt = async () => {
             name: 'salary'
         },
         {
-            type: 'input',
+            type: 'list',
             message: 'Enter department name.',
-            name: 'departmentName'
+            name: 'departmentName',
+            choices: ['Sales', 'Legal', 'Finance', 'Engineering']
         },
 
     ])
-    await addRole(answers.title, answers.salary, answers.department_name)
+    await addRole(answers.title, answers.salary, answers.departmentName)
     mainMenu()
 }
 //WHAT I THINK I HAVE TI DO IS, IN THE FUNCTION, SELECT FROM A JOINED TABLE TO BE ABLE TO CREATE THE VIEW FUNCTIONS
-
-
-
-
-
-
 const addEmployee = async (id: number, firstName: string, lastName: string, roleId: number, managerId: number) => {
     const query = `INSERT INTO employee (id, first_name, last_name, title, manager_id) VALUES ($1, $2, $3, $4, $5)`;
     const values = [id, firstName, lastName, roleId, managerId]
