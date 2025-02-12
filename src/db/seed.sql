@@ -29,7 +29,9 @@ VALUES
 ('Quintin','Jeffers', 6, 7),
 ('Michael', 'Scott', 3, null);
 
-
+INSERT INTO role role
+(title, salary, department_name)
+VALUES ($1, $2, $3);
 
 
 -- 'Lawyer', 153500, 4

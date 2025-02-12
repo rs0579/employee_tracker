@@ -17,56 +17,48 @@ async function mainMenu() {
         ])
         .then(async (answer) => {
             //THE ANSWER IS WHAT I AM EXPRECTING - I TRIED TO USE ANSWER.CHOICE BUT IT DIDN'T WORK BECAUSE THE NAME IS CHOICE. THEN I JUST TRIED CHOICE BUT EVENTUALLY I JUST FOLLOWED WHAT I DID IN THE VEHICLE BUILDER. **MAYBE IF I CREATE A VARIABLE WITH THE DESTRUCTURE CHOICE IT'L WORK AS INTENTED**
-                switch (answer.choice) {
-                    case 'view all departments':
-                        viewDepartments()
-                        break
-                    case 'view all roles':
-                        viewRoles()
-                        break
-                    case 'view all employees':
-                        viewEmployees()
-                        break
-                    case 'add a department':
-                        addDepartmentPrompt()
-                        break
-                    case 'add a role':
-                        addRolePrompt()
-                        break
-                    case 'add an employee':
-                        addEmployeePrompt()
-                        break
-                    case 'add an employee role':
-                        addEmployeeRole()
-                        break
-                    case 'Exit':
-                        break
-                    //I USED SWITCH HERE INSTEAD OF AN IF ELSE STATEMENT BECAUSE IT IS VERY LONG
-                }
-            
+            switch (answer.choice) {
+                case 'view all departments':
+                    viewDepartments()
+                    break
+                case 'view all roles':
+                    viewRoles()
+                    break
+                case 'view all employees':
+                    viewEmployees()
+                    break
+                case 'add a department':
+                    addDepartmentPrompt()
+                    break
+                case 'add a role':
+                    addRolePrompt()
+                    break
+                case 'add an employee':
+                    addEmployeePrompt()
+                    break
+                case 'add an employee role':
+                    addEmployeeRole()
+                    break
+                case 'Exit':
+                    process.exit()
+                //I USED SWITCH HERE INSTEAD OF AN IF ELSE STATEMENT BECAUSE IT IS VERY LONG
+            }
+
 
         })
 }
 
-
-const addDepartment = async (deparmentName: string, departmentId: number) => {
+const addDepartment = async (departmentId: number, departmentName: string) => {
     const query = `INSERT INTO department (id, name) VALUES ($1, $2)`;
-    const values = [departmentId, deparmentName]
+    const values = [departmentId, departmentName]
     try {
-        await pool.query(query, values)
+        const results = await pool.query(query, values)
+        console.table(results.rowCount)
     } catch (err) {
         console.error('Error adding employee', err);
 
     }
-}
-const addRole = async (id: number, title: string, salary: number, department_id: number) => {\
-    const query = `INSERT INTO roles (id, title, salary, department_id) VALUES ($1, $2, $3)`;
-    const values = [id, title, salary, department_id]
-    try {
-        await pool.query(query, values)
-    } catch (err) {
-        console.error('Error adding employee', err);
-    }
+    mainMenu()
 }
 const addDepartmentPrompt = async () => {
 
@@ -75,17 +67,50 @@ const addDepartmentPrompt = async () => {
         {
             type: 'number',
             message: 'Enter department id.',
-            name: 'deparmentId'
+            name: 'departmentId'
         },
         {
             type: 'input',
             message: 'Enter department name.',
-            name: 'deparmentName'
+            name: 'departmentName'
         },
     ])
     await addDepartment(answers.departmentId, answers.departmentName)
+    mainMenu()
     //CHECK OVER THIS ONE, YOU MAY NEED TO INSERT QUERY AND VALUES
+}
+async function viewDepartments() {
+    const results = await pool.query('SELECT * FROM department')
+    console.table(results.rows)
+    mainMenu()
+}
+async function viewRoles() {
+    const results = await pool.query(`SELECT role.id, role.title, department.name AS department, role.salary
+    FROM role
+    JOIN department 
+    ON department.id = role.department_id`
+    )
+    console.table(results.rows)
+    mainMenu()
+}
+const viewEmployees = async () => {
+    const results = await pool.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title. department.name, role.salary, employee.manager_id 
+        FROM employee
+        JOIN role, department
+        ON employee.role_id = role.id, department.role_id = role.id`)
+    console.table(results.rows)
 
+    mainMenu()
+}
+
+const addRole = async (title: string, salary: number, department_name: string) => {
+    const query = `INSERT INTO role (title, salary, department_name SELECT) VALUES ($1, $2, $3)`;
+    const values = [title, salary, department_name]
+    try {
+        await pool.query(query, values)
+    } catch (err) {
+        console.error('Error adding employee', err);
+    }
 }
 const addRolePrompt = async () => {
     const answers = await inquirer.prompt([
@@ -101,17 +126,25 @@ const addRolePrompt = async () => {
             name: 'salary'
         },
         {
-            type: 'number',
-            message: 'Enter role department.',
+            type: 'input',
+            message: 'Enter department name.',
             name: 'departmentName'
         },
 
     ])
-    await addRole(answers.title, answers.salary, answers.departmentName)
+    await addRole(answers.title, answers.salary, answers.department_name)
+    mainMenu()
 }
-const addEmployee = async (firstName: string, lastName: string, roleId: number, managerId: number) => {
-    const query = `INSERT INTO employee (firstName, lastName, title, managerId) VALUES ($1, $2, $3, $4)`;
-    const values = [firstName, lastName, roleId, managerId]
+//WHAT I THINK I HAVE TI DO IS, IN THE FUNCTION, SELECT FROM A JOINED TABLE TO BE ABLE TO CREATE THE VIEW FUNCTIONS
+
+
+
+
+
+
+const addEmployee = async (id: number, firstName: string, lastName: string, roleId: number, managerId: number) => {
+    const query = `INSERT INTO employee (id, first_name, last_name, title, manager_id) VALUES ($1, $2, $3, $4, $5)`;
+    const values = [id, firstName, lastName, roleId, managerId]
     try {
         await pool.query(query, values)
     } catch (err) {
@@ -139,34 +172,22 @@ const addEmployeePrompt = async () => {
             name: 'roleId'
         },
         {
-            type: 'input',
+            type: 'number',
             message: 'Enter employee manager.',
             name: 'managerId'
         }
     ])
-    await addEmployee(answers.firstName, answers.lastName, answers.roleId, answers.managerId)
-}
-//WHAT I THINK I HAVE TI DO IS, IN THE FUNCTION, SELECT FROM A JOINED TABLE TO BE ABLE TO CREATE THE VIEW FUNCTIONS
-
-function viewDepartments() {
-    pool.query('SELECT * FROM department')
+    await addEmployee(answers.id, answers.firstName, answers.lastName, answers.roleId, answers.managerId)
 }
 
-function viewRoles() {
-    pool.query(`SELECT role.id, role.title, department.name AS department, role.salary
-    FROM role
-    JOIN deparment 
-    ON department.id = role.department_id`
-    )
-}
 
-function viewEmployees() {
-    console.log('Anything')
-    pool.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title. department.name, role.salary, employee.manager_id 
-        FROM employee
-        LEFT JOIN role
-        ON employee.role = id.role`)
-}
+
+
+
+
+
+
+
 
 const addEmployeeRole = async () => {
     //select an employee to update and their new role
