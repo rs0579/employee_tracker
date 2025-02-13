@@ -101,15 +101,8 @@ const addDepartmentPrompt = async () => {
     mainMenu()
     //CHECK OVER THIS ONE, YOU MAY NEED TO INSERT QUERY AND VALUES
 }
-
-
-
-
-
-
-
 const addRole = async (title: string, salary: number, departmentName: string) => {
-    const query = `INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3, (SELECT id FROM department WHERE name = department_id))`;
+    const query = `INSERT INTO role (title, salary, department_id) VALUES ($1, $2, (SELECT id FROM department WHERE name = $3))`;
     const values = [title, salary, departmentName]
     try {
         const results = await pool.query(query, values)
@@ -144,6 +137,13 @@ const addRolePrompt = async () => {
     mainMenu()
 }
 //WHAT I THINK I HAVE TI DO IS, IN THE FUNCTION, SELECT FROM A JOINED TABLE TO BE ABLE TO CREATE THE VIEW FUNCTIONS
+
+
+
+
+
+
+
 const addEmployee = async (id: number, firstName: string, lastName: string, roleId: number, managerId: number) => {
     const query = `INSERT INTO employee (id, first_name, last_name, title, manager_id) VALUES ($1, $2, $3, $4, $5)`;
     const values = [id, firstName, lastName, roleId, managerId]
