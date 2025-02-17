@@ -38,4 +38,4 @@ npm run start
 
 ## Questions 
 
-[Email me](mailto:raheemsenegal@outlook.com) or you can find me at my [GitHub](github.com/rs0579).
+[Email me](mailto:raheemsenegal@outlook.com) or you can find me at my [GitHub](github.com/rs0579). Walkthrough: https://youtu.be/jARavQ1Hq6c
