@@ -47,6 +47,7 @@ async function mainMenu() {
 
         })
 }
+
 async function viewDepartments() {
     const results = await pool.query('SELECT * FROM department')
     console.table(results.rows)
@@ -67,6 +68,7 @@ const viewEmployees = async () => {
 
     mainMenu()
 }
+
 const addDepartment = async (departmentName: string) => {
     const query = `INSERT INTO department (name) VALUES ($1)`;
     const values = [departmentName]
@@ -77,8 +79,9 @@ const addDepartment = async (departmentName: string) => {
         console.error('Error adding employee', err);
 
     }
-    mainMenu()
+
 }
+
 const addDepartmentPrompt = async () => {
 
     //the name of the department
@@ -96,6 +99,7 @@ const addDepartmentPrompt = async () => {
     mainMenu()
     //CHECK OVER THIS ONE, YOU MAY NEED TO INSERT QUERY AND VALUES
 }
+
 const addRole = async (title: string, salary: number, departmentName: string) => {
     const query = `INSERT INTO role (title, salary, department_id) VALUES ($1, $2, (SELECT id FROM department WHERE name = $3))`;
     const values = [title, salary, departmentName]
@@ -131,9 +135,12 @@ const addRolePrompt = async () => {
     ])
     await addRole(answers.title, answers.salary, answers.departmentName)
     console.log(`Added ${answers.title} to the database.`)
+
     mainMenu()
+
 }
 //WHAT I THINK I HAVE TI DO IS, IN THE FUNCTION, SELECT FROM A JOINED TABLE TO BE ABLE TO CREATE THE VIEW FUNCTIONS
+
 const addEmployee = async (firstName: string, lastName: string, roleId: number, managerId: number | null) => {
     const query = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`;
     const values = [firstName, lastName, roleId, managerId];
@@ -192,11 +199,11 @@ const addEmployeePrompt = async () => {
 
         await addEmployee(answers.firstName, answers.lastName, answers.roleId, answers.managerId);
 
-        mainMenu()
-
     } catch (err) {
         console.error('Error in addEmployeePrompt:', err);
     }
+    
+    mainMenu()
 }
 
 
