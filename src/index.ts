@@ -191,9 +191,9 @@ const addEmployeePrompt = async () => {
         }
 
         await addEmployee(answers.firstName, answers.lastName, answers.roleId, answers.managerId);
-        
+
         mainMenu()
-        
+
     } catch (err) {
         console.error('Error in addEmployeePrompt:', err);
     }
@@ -224,11 +224,12 @@ const updateEmployeeRole = async () => {
             ])
         await pool.query('UPDATE employee SET role_id = $1 WHERE id = $2;', [employeeId, newRoleId])
         console.log('Employee role updated successfully!')
-            ;
+
     } catch (err) {
-        console.error('Error updating employee role:', err);
+        console.error('Error updating employee role:', err)
     }
     mainMenu()
 }
+
 
 mainMenu()
