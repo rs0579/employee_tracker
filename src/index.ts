@@ -37,7 +37,7 @@ async function mainMenu() {
                     addEmployeePrompt()
                     break
                 case 'add an employee role':
-                    addEmployeeRole()
+                    updateEmployeeRole()
                     break
                 case 'Exit':
                     process.exit()
@@ -67,12 +67,9 @@ const viewEmployees = async () => {
 
     mainMenu()
 }
-
-
-
-const addDepartment = async (departmentId: number, departmentName: string) => {
-    const query = `INSERT INTO department (id, name) VALUES ($1, $2)`;
-    const values = [departmentId, departmentName]
+const addDepartment = async (departmentName: string) => {
+    const query = `INSERT INTO department (name) VALUES ($1)`;
+    const values = [departmentName]
     try {
         const results = await pool.query(query, values)
         console.table(results.rowCount)
@@ -86,18 +83,16 @@ const addDepartmentPrompt = async () => {
 
     //the name of the department
     const answers = await inquirer.prompt([
-        {
-            type: 'number',
-            message: 'Enter department id.',
-            name: 'departmentId'
-        },
+
         {
             type: 'input',
             message: 'Enter department name.',
             name: 'departmentName'
         },
     ])
-    await addDepartment(answers.departmentId, answers.departmentName)
+    await addDepartment(answers.departmentName)
+    console.log(`Added ${answers.departmentName} to the database.`)
+
     mainMenu()
     //CHECK OVER THIS ONE, YOU MAY NEED TO INSERT QUERY AND VALUES
 }
@@ -106,12 +101,13 @@ const addRole = async (title: string, salary: number, departmentName: string) =>
     const values = [title, salary, departmentName]
     try {
         const results = await pool.query(query, values)
-        console.table(results.rowCount)
+        console.log(results.rowCount)
     } catch (err) {
         console.error('Error adding employee', err);
     }
 }
 const addRolePrompt = async () => {
+    const department = await pool.query(`SELECT * FROM department`)
 
     const answers = await inquirer.prompt([
         // the name, salary, and department for the role 
@@ -129,130 +125,110 @@ const addRolePrompt = async () => {
             type: 'list',
             message: 'Enter department name.',
             name: 'departmentName',
-            choices: ['Sales', 'Legal', 'Finance', 'Engineering']
+            choices: department.rows.map((d: { name: string; id: any; }) => ({ name: d.name, value: d.id }))
         },
 
     ])
     await addRole(answers.title, answers.salary, answers.departmentName)
+    console.log(`Added ${answers.title} to the database.`)
     mainMenu()
 }
 //WHAT I THINK I HAVE TI DO IS, IN THE FUNCTION, SELECT FROM A JOINED TABLE TO BE ABLE TO CREATE THE VIEW FUNCTIONS
+const addEmployee = async (firstName: string, lastName: string, roleId: number, managerId: number | null) => {
+    const query = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`;
+    const values = [firstName, lastName, roleId, managerId];
 
-
-
-
-
-
-
-const addEmployee = async (id: number, firstName: string, lastName: string, roleId: number, managerId: number) => {
-    const query = `INSERT INTO employee (id, first_name, last_name, title, manager_id) VALUES ($1, $2, $3, $4, $5)`;
-    const values = [id, firstName, lastName, roleId, managerId]
     try {
-        await pool.query(query, values)
+        await pool.query(query, values);
+        console.log(`Added ${firstName} ${lastName} to the database.`);
     } catch (err) {
-        console.error('Error adding employee', err);
-
+        console.error('Error adding employee:', err);
     }
 }
 const addEmployeePrompt = async () => {
+    try {
+        const [employees, roles] = await Promise.all([
+            pool.query('SELECT * FROM employee'),
+            pool.query('SELECT * FROM role')
+        ]);
 
-    const answers = await inquirer.prompt([
-        //employee’s first name, last name, role, and manager
-        {
-            type: 'input',
-            message: 'Enter employee first name.',
-            name: 'fistName'
-        },
-        {
-            type: 'input',
-            message: 'Enter employee last name.',
-            name: 'lastName'
-        },
-        {
-            type: 'input',
-            message: 'Enter employee role ID.',
-            name: 'roleId'
-        },
-        {
-            type: 'number',
-            message: 'Enter employee manager.',
-            name: 'managerId'
-        }
-    ])
-    await addEmployee(answers.id, answers.firstName, answers.lastName, answers.roleId, answers.managerId)
-}
-
-
-
-
-
-
-
-
-
-
-const addEmployeeRole = async () => {
-    //select an employee to update and their new role
-    const { employeeId, newRoleId } = await inquirer
-        .prompt([
+        const answers = await inquirer.prompt([
             {
-                type: 'number',
-                name: 'employeeId',
-                message: 'Enter employee ID:'
+                type: 'input',
+                message: 'Enter employee first name:',
+                name: 'firstName' // Fixed typo here
             },
             {
-                type: 'number',
-                name: 'newRoleId',
-                message: 'Enter new role ID:'
+                type: 'input',
+                message: 'Enter employee last name:',
+                name: 'lastName'
+            },
+            {
+                type: 'list',
+                name: 'roleId',
+                message: 'Select role:',
+                choices: roles.rows.map((r: { title: string; id: number }) => ({ name: r.title, value: r.id }))
+            },
+            {
+                type: 'list',
+                name: 'managerId',
+                message: 'Select manager:',
+                choices: [
+                    ...employees.rows.map((e: { first_name: string; last_name: string; id: number }) => ({ name: `${e.first_name} ${e.last_name}`, value: e.id })),
+                    { name: 'N/A', value: null }
+                ]
             }
         ]);
-    const sql = `UPDATE employee SET role_id = $1 WHERE id = $2`
-    await pool.query(sql, [newRoleId, employeeId]);
-    //THE ABOVE IS LIKE USING A TEMPLATE LITERAL IN THAT THE $1 AND 2 ARE EMPTY SLOTS THAT WILL BE FILLED BY newROLEID AND employeeID. IDK IF WE WERE SUPPOSED TO USE THIS IN THIS ASSIGNMENT.
+
+        // Log manager's name if applicable
+        if (answers.managerId) {
+            const managerQuery = `SELECT first_name, last_name FROM employee WHERE id = $1`;
+            const managerResult = await pool.query(managerQuery, [answers.managerId]);
+            if (managerResult.rows.length > 0) {
+                const { first_name: managerFirstName, last_name: managerLastName } = managerResult.rows[0];
+                console.log(`Employee "${answers.firstName} ${answers.lastName}" added! Manager: ${managerFirstName} ${managerLastName}`);
+            }
+        }
+
+        await addEmployee(answers.firstName, answers.lastName, answers.roleId, answers.managerId);
+        
+        mainMenu()
+        
+    } catch (err) {
+        console.error('Error in addEmployeePrompt:', err);
+    }
 }
 
-// const sql = `UPDATE employee SET role_id = $1 WHERE id = $2`
 
 
 
-
-
-
-
-
-
+const updateEmployeeRole = async () => {
+    //select an employee to update and their new role
+    const employees = await pool.query('SELECT * FROM employee;');
+    const roles = await pool.query('SELECT * FROM role;')
+    try {
+        const { employeeId, newRoleId } = await inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    name: 'employeeId',
+                    message: 'Update employee ID:',
+                    choices: employees.rows.map((e: { first_name: any; last_name: any; id: any; }) => ({ name: `${e.first_name} ${e.last_name}`, value: e.id })),
+                },
+                {
+                    type: 'list',
+                    name: 'newRoleId',
+                    message: 'Update employee role ID:',
+                    choices: roles.rows.map((r: { title: any; id: any; }) => ({ name: r.title, value: r.id }))
+                }
+            ])
+        await pool.query('UPDATE employee SET role_id = $1 WHERE id = $2;', [employeeId, newRoleId])
+        console.log('Employee role updated successfully!')
+            ;
+    } catch (err) {
+        console.error('Error updating employee role:', err);
+    }
+    mainMenu()
+}
 
 mainMenu()
-
-
-
-
-
-
-
-
-
-// .then(async (answer) => {
-//     //THE ANSWER IS WHAT I AM EXPRECTING - I TRIED TO USE ANSWER.CHOICE BUT IT DIDN'T WORK BECAUSE THE NAME IS CHOICE. THEN I JUST TRIED CHOICE BUT EVENTUALLY I JUST FOLLOWED WHAT I DID IN THE VEHICLE BUILDER. **MAYBE IF I CREATE A VARIABLE WITH THE DESTRUCTURE CHOICE IT'L WORK AS INTENTED**
-//     do {
-// if (answer.choice === 'view all departments') {
-//     viewDepartments()
-// } else if (answer.choice === 'view all roles') {
-//     viewRoles()
-// } else if (answer.choice === 'view all employees') {
-//     viewEmployees()
-// } else if (answer.choice === 'add a department') {
-//     addDepartmentPrompt()
-// } else if (answer.choice === 'add a role') {
-//     addRolePrompt()
-// } else if (answer.choice === 'add an employee') {
-//     addEmployeePrompt()
-// } else if (answer.choice === 'add an employee role') {
-//     addEmployeeRole()
-// } else (answer.choice === 'Exit')
-
-//             }
-//             while (answer.choice !== 'Exit')
-//         }
-//         )
-// }
