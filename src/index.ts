@@ -36,7 +36,7 @@ async function mainMenu() {
                 case 'add an employee':
                     addEmployeePrompt()
                     break
-                case 'add an employee role':
+                case 'update an employee role':
                     updateEmployeeRole()
                     break
                 case 'Exit':
@@ -210,26 +210,28 @@ const addEmployeePrompt = async () => {
 
 
 const updateEmployeeRole = async () => {
+    console.log('updateEmployeeRole');
+    
     //select an employee to update and their new role
     const employees = await pool.query('SELECT * FROM employee;');
     const roles = await pool.query('SELECT * FROM role;')
     try {
-        const { employeeId, newRoleId } = await inquirer
+        const { employeeName, newRole } = await inquirer
             .prompt([
                 {
                     type: 'list',
-                    name: 'employeeId',
-                    message: 'Update employee ID:',
+                    name: 'employeeName ',
+                    message: 'Choose employee that you want to update:',
                     choices: employees.rows.map((e: { first_name: any; last_name: any; id: any; }) => ({ name: `${e.first_name} ${e.last_name}`, value: e.id })),
                 },
                 {
                     type: 'list',
-                    name: 'newRoleId',
-                    message: 'Update employee role ID:',
+                    name: 'newRole',
+                    message: 'Update employee role:',
                     choices: roles.rows.map((r: { title: any; id: any; }) => ({ name: r.title, value: r.id }))
                 }
             ])
-        await pool.query('UPDATE employee SET role_id = $1 WHERE id = $2;', [employeeId, newRoleId])
+        await pool.query('UPDATE employee SET role_id = $1 WHERE id = $2;', [employeeName, newRole])
         console.log('Employee role updated successfully!')
 
     } catch (err) {
