@@ -2,7 +2,8 @@
 
 ## Description
 
-This project allows a user to view departments, roles and employees on tables that have been created via MySQL, using the postgres dialect. Moreover, the user can add departments, roles, or employees in addition to updating an employee's details. 
+This application will allow the user to make Create, Read. Update and Delete users from an SQL database. It was constructed using postgreSQL syntax. 
+I wanted to make this application to implement the SQL competencies I had learned.
 
 ## Table of Contents
 
@@ -15,11 +16,11 @@ This project allows a user to view departments, roles and employees on tables th
 
 ## Installation
 
-npm i pg/npm i inquirer/npm i dotenv
-
+To run the application, in your node enviornment run the command: npm run start
+Node packages required: npm i pg/npm i inquirer/npm i dotenv
 
 ## Usage
- One can use it as a reference for study.
+ You may my code base as a reference only. Please give me credit, however, if you do choose to use it. ![thumbnail](assets/images/12-sql-homework-video-thumbnail.png) ![realtionship](assets/images/100-sql-challenge-ERD.png)
 
 ## License
 
@@ -30,12 +31,13 @@ MIT
 
 ## Contributions
 
-To contribute, send me an email. 
+If you want to contribute to the repo, do not hesistate to email me. My email can be found below.
 
 ## Tests
 
-npm run start
+Tests are to be performed incrementally.
 
 ## Questions 
 
-[Email me](mailto:raheemsenegal@outlook.com) or you can find me at my [GitHub](github.com/rs0579). Walkthrough: https://youtu.be/jARavQ1Hq6c
+[Email me](mailto:raheemsenegal@outlook.com) or you can find me at my [GitHub](github.com/rs0579) Walkthrough: https://youtu.be/jARavQ1Hq6c
+
